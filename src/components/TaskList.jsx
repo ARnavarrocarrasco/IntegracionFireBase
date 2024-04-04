@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {motion} from "framer-motion";
 import {FaThList} from "react-icons/fa"
+import { addTask } from '../firebase/tasksController';
 
 const TaskList = ({showSettings, setShowSettings}) => {
     const [taskList, setTaskList] = useState([]);
@@ -9,12 +10,23 @@ const TaskList = ({showSettings, setShowSettings}) => {
 
     const addNewTask = () => {
         if (newTask === "") return;
-        setTaskList([...taskList, { task: newTask, completed: false }]);
-        setNewTask('');
+        //Vamos añadir una nueva tarea a la base de datos
+        const task = { task: newTask, completed: false }
+        addTask(task)
+            .then(() => {
+                //Cuando se haya añadido -> mostraremos dentro del estado taskList
+                return setTaskList([...taskList, task]);
+            })
+            .catch(e => console.error(e))
+            .finally(() => setNewTask(""));
     };
 
     const toggleCompletedItem = (index) => {
-        const newTaskList = [...taskList];
+        let newTaskList = taskList
+        
+        //Actualizar en la base de datos el estado de la tarea
+
+        //Cuando se haya actualizado -> mostraremos todas las tareas estado taskList
         newTaskList[index].completed = !newTaskList[index].completed;
         setTaskList(newTaskList);
     };
@@ -39,7 +51,7 @@ const TaskList = ({showSettings, setShowSettings}) => {
             <header className='flex justify-between'>
                 <div className='flex items-center gap-2'> 
                     <FaThList className='text-2xl text-sky-700'/> 
-                    <span className='text-2xl text-sky-700 font-semibold'> Task List V6</span>
+                    <span className='text-2xl text-sky-700 font-semibold'> Task List V10 - espero salga bien</span>
                 </div>
                 <motion.button  
                     whileHover={{scale: 1.1}} 
